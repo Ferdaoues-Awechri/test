@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 25%, #f3e5f5 50%, #e1f5fe 75%, #e8f5e9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    touch-action: none;
+  }
+
+  .hearts-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .heart-float {
+    position: absolute;
+    animation: floatUp linear infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  .card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,0.93);
+    border-radius: 8px;
+    padding: 2.5rem 1.8rem 2rem;
+    max-width: 380px;
+    width: 88%;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(233,30,99,0.13), 0 4px 16px rgba(0,0,0,0.07);
+    border: 2px solid rgba(233,30,99,0.12);
+    transition: all 0.3s ease;
+  }
+
+  .emoji-big {
+    font-size: 4.5rem;
+    display: block;
+    margin-bottom: 0.6rem;
+    animation: bounce 1.3s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-14px) rotate(5deg); }
+  }
+
+  h1 {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #c2185b;
+    margin-bottom: 2rem;
+    line-height: 1.35;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    position: relative;
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #f48fb1, #e91e63);
+    color: white;
+    box-shadow: 0 4px 15px rgba(233,30,99,0.4);
+    position: fixed;
+    z-index: 999;
+  }
+
+  .btn-no {
+    background: #607d8b;
+    color: white;
+    box-shadow: 0 4px 14px rgba(96,125,139,0.25);
+    position: relative;
+    z-index: 20;
+    min-width: 90px;
+  }
+
+  /* ── QUIZ SCREEN ── */
+  #quiz-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .quiz-emoji { font-size: 3.5rem; }
+
+  .quiz-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #c2185b;
+    line-height: 1.4;
+  }
+
+  .quiz-sub {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ad1457;
+    opacity: 0.75;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .quiz-input {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #f48fb1;
+    outline: none;
+    width: 130px;
+    text-align: center;
+    color: #c2185b;
+    background: #fff0f5;
+    touch-action: manipulation;
+  }
+
+  .quiz-input:focus {
+    border-color: #e91e63;
+    background: white;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #f48fb1, #e91e63);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 4px 14px rgba(233,30,99,0.35);
+  }
+
+  /* ── WRONG ANSWER ── */
+  #wrong-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-10px); }
+    40%     { transform: translateX(10px); }
+    60%     { transform: translateX(-8px); }
+    80%     { transform: translateX(8px); }
+  }
+
+  .wrong-emoji { font-size: 3.5rem; }
+
+  .wrong-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #c2185b;
+  }
+
+  .wrong-sub {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #ad1457;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  .btn-retry {
+    margin-top: 0.4rem;
+    background: #607d8b;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 4px 14px rgba(96,125,139,0.25);
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+    font-size: 1.2rem;
+  }
+
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .attempts-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #e91e63;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<div class="card" id="mainCard">
+
+  <!-- MAIN SCREEN -->
+  <div id="main-screen">
+    <span class="emoji-big">💕</span>
+    <h1>Do you wanna go on a date with me? </h1>
+    <div class="btn-group" id="btnGroup">
+      <button class="btn btn-yes" id="yesBtn">Yes 💖</button>
+      <button class="btn btn-no" id="noBtn">No</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen">
+    <p class="quiz-title">ok fine… but first.<br>answer this correctly and i'll give you a chance</p>
+    <p class="quiz-sub">what's my height?</p>
+    <div class="input-row">
+      <input class="quiz-input" id="heightInput" type="number" placeholder="??? cm" inputmode="numeric" />
+      <button class="btn-submit" id="submitBtn">Go</button>
+    </div>
+    <p class="attempts-badge" id="attemptsBadge"></p>
+  </div>
+
+  <!-- WRONG SCREEN -->
+  <div id="wrong-screen">
+    <span class="wrong-emoji">💀</span>
+    <p class="wrong-title">WRONG. absolutely not.</p>
+    <button class="btn-retry" id="retryBtn">try again </button>
+  </div>
+
+</div>
+
+<script>
+  // Floating hearts
+  const heartsBg = document.getElementById('heartsBg');
+  const emojis = ['💕','💖','🌸','✨','💫','🥺','💝','🌺','💗','⭐'];
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement('div');
+    h.className = 'heart-float';
+    h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+    h.style.animationDuration = (7 + Math.random() * 10) + 's';
+    h.style.animationDelay = (Math.random() * 8) + 's';
+    heartsBg.appendChild(h);
+  }
+
+  // Yes button runs away
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn  = document.getElementById('noBtn');
+  let initialized = false;
+
+  function initPos() {
+    if (initialized) return;
+    const rect = yesBtn.getBoundingClientRect();
+    yesBtn.style.left = rect.left + 'px';
+    yesBtn.style.top  = rect.top  + 'px';
+    initialized = true;
+  }
+
+  function moveYes() {
+    initPos();
+    const m = 16;
+    const w = yesBtn.offsetWidth  || 110;
+    const h = yesBtn.offsetHeight || 48;
+    yesBtn.style.left = (m + Math.random() * (window.innerWidth  - w - m * 2)) + 'px';
+    yesBtn.style.top  = (m + Math.random() * (window.innerHeight - h - m * 2)) + 'px';
+  }
+
+  yesBtn.addEventListener('mouseenter', moveYes);
+  yesBtn.addEventListener('touchstart', e => { e.preventDefault(); moveYes(); }, { passive: false });
+  window.addEventListener('load', initPos);
+
+  // No → quiz
+  noBtn.addEventListener('click', () => {
+    yesBtn.style.display = 'none';
+    show('quiz-screen');
+    hide('main-screen');
+    dropConfetti(['💔','😤','😒','🙄'], 12);
+  });
+
+  // Submit answer — every answer is wrong
+  let attempts = 0;
+  const wrongLines = [
+    "that's not even close bestie 😭",
+    "lmaooo no. try harder 💀",
+    "are you even trying rn 😐",
+    "nope. not it. not even warm 🧊",
+    "bro just guessing at this point 💅",
+    "you literally just made that up 😤",
+    "wrong again. shocking. truly. 🫠",
+    "i'm actually embarrassed for you 😬",
+  ];
+
+  document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+  document.getElementById('heightInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  function checkAnswer() {
+    const val = document.getElementById('heightInput').value.trim();
+    if (!val) return;
+    attempts++;
+    document.getElementById('attemptsBadge').textContent = '';
+    const line = wrongLines[Math.min(attempts - 1, wrongLines.length - 1)];
+    hide('quiz-screen');
+    const ws = document.getElementById('wrong-screen');
+    ws.style.display = 'flex';
+    ws.style.animation = 'none';
+    ws.offsetHeight; // reflow
+    ws.style.animation = '';
+    dropConfetti(['💔','😭','🥺','😢'], 10);
+  }
+
+  // Retry → back to quiz
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    document.getElementById('heightInput').value = '';
+    document.getElementById('attemptsBadge').textContent =
+      attempts > 1 ? `attempt ${attempts + 1}... same result tho 🙃` : '';
+    hide('wrong-screen');
+    show('quiz-screen');
+  });
+
+  function show(id) {
+    const el = document.getElementById(id);
+    el.style.display = 'flex';
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = '';
+  }
+
+  function hide(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function dropConfetti(set, count) {
+    for (let i = 0; i < count; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.textContent = set[Math.floor(Math.random() * set.length)];
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+      c.style.animationDelay    = (Math.random() * 0.6) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }
+  }
+</script>
+</body>
+</html>
