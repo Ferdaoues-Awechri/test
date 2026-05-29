@@ -21,6 +21,35 @@
     touch-action: none;
   }
 
+  /* force light mode always — no dark mode */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 25%, #f3e5f5 50%, #e1f5fe 75%, #e8f5e9 100%) !important;
+      color: #c2185b !important;
+    }
+    .card {
+      background: rgba(255,255,255,0.97) !important;
+      border-color: rgba(233,30,99,0.18) !important;
+    }
+    h1, .quiz-title, .wrong-title { color: #c2185b !important; }
+    .quiz-sub, .wrong-sub        { color: #ad1457 !important; }
+    .attempts-badge              { color: #e91e63 !important; }
+    .quiz-input {
+      background: #fff0f5 !important;
+      color: #c2185b !important;
+      border-color: #f48fb1 !important;
+    }
+    .quiz-input:focus {
+      background: #ffffff !important;
+      border-color: #e91e63 !important;
+    }
+    .btn-no, .btn-retry { background: #607d8b !important; color: #ffffff !important; }
+    .btn-yes, .btn-submit {
+      background: linear-gradient(135deg, #f48fb1, #e91e63) !important;
+      color: #ffffff !important;
+    }
+  }
+
   .hearts-bg {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -44,7 +73,7 @@
   .card {
     position: relative;
     z-index: 10;
-    background: rgba(255,255,255,0.93);
+    background: rgba(255,255,255,0.97);
     border-radius: 8px;
     padding: 2.5rem 1.8rem 2rem;
     max-width: 380px;
@@ -115,7 +144,6 @@
     min-width: 90px;
   }
 
-  /* ── QUIZ SCREEN ── */
   #quiz-screen {
     display: none;
     flex-direction: column;
@@ -182,7 +210,6 @@
     box-shadow: 0 4px 14px rgba(233,30,99,0.35);
   }
 
-  /* ── WRONG ANSWER ── */
   #wrong-screen {
     display: none;
     flex-direction: column;
@@ -265,7 +292,7 @@
   <!-- MAIN SCREEN -->
   <div id="main-screen">
     <span class="emoji-big">💕</span>
-    <h1>Do you wanna go on a date with me? </h1>
+    <h1>Do you wanna go on a date with me?</h1>
     <div class="btn-group" id="btnGroup">
       <button class="btn btn-yes" id="yesBtn">Yes 💖</button>
       <button class="btn btn-no" id="noBtn">No</button>
@@ -287,13 +314,12 @@
   <div id="wrong-screen">
     <span class="wrong-emoji">💀</span>
     <p class="wrong-title">WRONG. absolutely not.</p>
-    <button class="btn-retry" id="retryBtn">try again </button>
+    <button class="btn-retry" id="retryBtn">try again</button>
   </div>
 
 </div>
 
 <script>
-  // Floating hearts
   const heartsBg = document.getElementById('heartsBg');
   const emojis = ['💕','💖','🌸','✨','💫','🥺','💝','🌺','💗','⭐'];
   for (let i = 0; i < 14; i++) {
@@ -307,7 +333,6 @@
     heartsBg.appendChild(h);
   }
 
-  // Yes button runs away
   const yesBtn = document.getElementById('yesBtn');
   const noBtn  = document.getElementById('noBtn');
   let initialized = false;
@@ -333,7 +358,6 @@
   yesBtn.addEventListener('touchstart', e => { e.preventDefault(); moveYes(); }, { passive: false });
   window.addEventListener('load', initPos);
 
-  // No → quiz
   noBtn.addEventListener('click', () => {
     yesBtn.style.display = 'none';
     show('quiz-screen');
@@ -341,7 +365,6 @@
     dropConfetti(['💔','😤','😒','🙄'], 12);
   });
 
-  // Submit answer — every answer is wrong
   let attempts = 0;
   const wrongLines = [
     "that's not even close bestie 😭",
@@ -369,12 +392,11 @@
     const ws = document.getElementById('wrong-screen');
     ws.style.display = 'flex';
     ws.style.animation = 'none';
-    ws.offsetHeight; // reflow
+    ws.offsetHeight;
     ws.style.animation = '';
     dropConfetti(['💔','😭','🥺','😢'], 10);
   }
 
-  // Retry → back to quiz
   document.getElementById('retryBtn').addEventListener('click', () => {
     document.getElementById('heightInput').value = '';
     document.getElementById('attemptsBadge').textContent =
